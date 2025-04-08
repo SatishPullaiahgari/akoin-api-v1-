@@ -32,18 +32,18 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    const token = generateToken(user.user_id);
+    const token = generateToken({user_id: user.user_id,email: user.email, username: user.username});
     const wallet = await MainBalanceModel.findOne({ user_id: user.user_id });
     res.status(200).json({
       message: "Login successful",
-      token: `Bearer ${token}`,
-      user: {
-        user_id: user.user_id,
-        username: user.username,
-        email: user.email,
-        isKycPending: user.isKycPending,
-        main_balance: wallet?.main_balance || 0, 
-      },
+      token: `Bearer ${token}`
+      // user: {
+      //   user_id: user.user_id,
+      //   username: user.username,
+      //   email: user.email,
+      //   isKycPending: user.isKycPending,
+      //   main_balance: wallet?.main_balance || 0, 
+      // },
     });
   } catch (error) {
     console.error("Login error:", error);

@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { MainBalanceModel } from '../model/main-blanance-model';
 import { TransactionModel } from '../model/trasanctionModel';
+import { AuthRequest } from '../middleware/auth.middleware'; 
 
-export const addOrUpdateMainBalance = async (req: Request, res: Response): Promise<any> => {
+export const addOrUpdateMainBalance = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const { user_id, amount } = req.body;
+    const user_id = req.user?.user_id; 
+    const { amount } = req.body;
 
     if (!user_id || typeof amount !== 'number') {
       return res.status(400).json({ message: 'user_id and amount are required' });

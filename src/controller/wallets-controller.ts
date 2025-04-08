@@ -1,12 +1,13 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { WalletModel } from '../model/wallet.model';
+import { AuthRequest } from '../middleware/auth.middleware';
 
-export const getUserWalletsOnly = async (req: Request, res: Response): Promise<any> => {
+export const getUserWalletsOnly = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const { user_id } = req.body;
+    const user_id = req.user?.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ message: 'user_id is required' });
+      return res.status(400).json({ message: 'Unauthorized: user_id not found in token' });
     }
 
     const wallets = await WalletModel.find({ user_id }).select(
