@@ -8,6 +8,8 @@ export interface IUser extends Document {
   password: string;
   isKycPending: boolean;
   main_balance:number,
+  resetToken?: string;
+  resetTokenExpiry?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -17,7 +19,10 @@ const UserSchema = new Schema<IUser>({
   email:    { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isKycPending: { type: Boolean, default: true },
-  main_balance:{type:Number, default:0}
+  main_balance:{type:Number, default:0},
+  // resetToken :{type:String, required:true},
+  // resetTokenExpiry:{type:String, required:true}
+  
 });
 
 // Compare password method
@@ -25,4 +30,5 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default UserSchema;
+
+export const UserModel = mongoose.model<IUser>("User", UserSchema);

@@ -15,9 +15,11 @@ const transaction_history_controller_1 = require("../controller/transaction-hist
 const auth_middleware_1 = require("../middleware/auth.middleware");
 const add_bank_account_controller_1 = require("../controller/add-bank-account-controller");
 const get_all_bankaccounts_1 = require("../controller/get-all-bankaccounts");
+const password_rest_controller_1 = require("../controller/password-rest-controller");
 const router = express_1.default.Router();
 router.post("/register-user", register_controller_1.registerUser);
 router.post("/login-user", login_controller_1.loginUser);
+router.post("/reset-password", password_rest_controller_1.passwordReset);
 router.use(auth_middleware_1.verifyToken);
 router.post("/update-kyc", update_kyc_1.updateKyc);
 // wallet
@@ -31,5 +33,7 @@ router.post("/transaction-history", auth_middleware_1.verifyToken, transaction_h
 //bank-accounts
 router.post("/add-bank-account", auth_middleware_1.verifyToken, add_bank_account_controller_1.addBankAccount);
 router.get("/get-bank-accounts", auth_middleware_1.verifyToken, get_all_bankaccounts_1.getAllBankAccounts);
+//passsword-reset
+// router.post("/reset-password", passwordReset);
 exports.default = router;
 //# sourceMappingURL=routes.js.map

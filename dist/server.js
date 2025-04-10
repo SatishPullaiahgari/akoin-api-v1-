@@ -16,16 +16,16 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use((0, helmet_1.default)());
 app.use("/akoin", routes_1.default);
-// DB connection using .env
+// ✅ Connect to DB and start server only if DB is connected
 mongoose_1.default
     .connect(process.env.MONGO_URI)
     .then(() => {
-    console.log("connected successfully");
+    console.log("MongoDB connected successfully");
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+    });
 })
     .catch((error) => {
-    console.log("connection failed", error);
-});
-app.listen(PORT, () => {
-    console.log(` connect DB successfully http://localhost:${PORT}`);
+    console.log(" MongoDB connection failed:", error);
 });
 //# sourceMappingURL=server.js.map

@@ -15,16 +15,16 @@ app.use(cors());
 app.use(helmet());
 app.use("/akoin", router);
 
-// DB connection using .env
+// ✅ Connect to DB and start server only if DB is connected
 mongoose
   .connect(process.env.MONGO_URI as string)
   .then(() => {
-    console.log("connected successfully");
+    console.log("MongoDB connected successfully");
+
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
   })
   .catch((error) => {
-    console.log("connection failed", error);
+    console.log(" MongoDB connection failed:", error);
   });
-
-app.listen(PORT, () => {
-  console.log(` connect DB successfully http://localhost:${PORT}`);
-});

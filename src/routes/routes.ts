@@ -10,6 +10,8 @@ import { getTransactionHistory } from "../controller/transaction-history-control
 import { verifyToken } from '../middleware/auth.middleware';
 import { addBankAccount } from "../controller/add-bank-account-controller";
 import { getAllBankAccounts } from "../controller/get-all-bankaccounts";
+import { passwordReset } from "../controller/password-rest-controller";
+
 
 
 
@@ -21,6 +23,7 @@ const router = express.Router();
 
 router.post("/register-user", registerUser);
 router.post("/login-user", loginUser);
+router.post("/reset-password", passwordReset);
 
 
 router.use(verifyToken);
@@ -42,6 +45,9 @@ router.post("/transaction-history",verifyToken, getTransactionHistory);
 //bank-accounts
 router.post("/add-bank-account", verifyToken,addBankAccount)
 router.get("/get-bank-accounts", verifyToken, getAllBankAccounts);
+
+//passsword-reset
+// router.post("/reset-password", passwordReset);
 
 
 

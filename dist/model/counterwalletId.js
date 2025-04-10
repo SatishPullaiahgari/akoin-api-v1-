@@ -36,9 +36,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WalletCounterModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const CounterSchema = new mongoose_1.Schema({
-    name: { type: String, required: true }, // ✅ Fix: use `name` instead of `id`
+    name: { type: String, required: true },
     seq: { type: Number, default: 0 },
 });
-// ✅ Use existing model if already compiled
 exports.WalletCounterModel = mongoose_1.default.models.WalletCounter || mongoose_1.default.model('WalletCounter', CounterSchema);
 //# sourceMappingURL=counterwalletId.js.map
