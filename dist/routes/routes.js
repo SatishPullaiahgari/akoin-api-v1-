@@ -16,10 +16,25 @@ const auth_middleware_1 = require("../middleware/auth.middleware");
 const add_bank_account_controller_1 = require("../controller/add-bank-account-controller");
 const get_all_bankaccounts_1 = require("../controller/get-all-bankaccounts");
 const password_rest_controller_1 = require("../controller/password-rest-controller");
+//for heartbeat post naveen
+const heart_beat_controller_1 = require("../controller/heart-beat-controller");
+const show_heart_beat_controller_1 = require("../controller/show-heart-beat-controller");
+const get_breathe_rate_1 = require("../controller/get-breathe-rate");
+const post_brethe_rate_1 = require("../controller/post-brethe-rate");
+const excel_download_heart_rate_1 = require("../controller/excel-download-heart-rate");
+const vitalSign_controller_1 = require("../controller/vitalSign-controller");
 const router = express_1.default.Router();
+router.post('/vital-signs', vitalSign_controller_1.createVitalSigns);
+router.get('/vital-signs/data', vitalSign_controller_1.getRecentVitalSigns);
+//heart-beat rourtes
+router.post("/heart-beat", heart_beat_controller_1.postHeartBeat);
+router.get("/heart-beat", show_heart_beat_controller_1.getUserHeartBeats);
+//breathe-rates
+router.post("/breathe-rate", post_brethe_rate_1.postBreathRate);
+router.get("/breathe-rate", get_breathe_rate_1.getUserBreathRates);
+router.get('/heart-rate/export', excel_download_heart_rate_1.exportHeartRateToExcel);
 router.post("/register-user", register_controller_1.registerUser);
 router.post("/login-user", login_controller_1.loginUser);
-router.post("/reset-password", password_rest_controller_1.passwordReset);
 router.use(auth_middleware_1.verifyToken);
 router.post("/update-kyc", update_kyc_1.updateKyc);
 // wallet
@@ -34,6 +49,6 @@ router.post("/transaction-history", auth_middleware_1.verifyToken, transaction_h
 router.post("/add-bank-account", auth_middleware_1.verifyToken, add_bank_account_controller_1.addBankAccount);
 router.get("/get-bank-accounts", auth_middleware_1.verifyToken, get_all_bankaccounts_1.getAllBankAccounts);
 //passsword-reset
-// router.post("/reset-password", passwordReset);
+router.post("/reset-password", password_rest_controller_1.passwordReset);
 exports.default = router;
 //# sourceMappingURL=routes.js.map

@@ -14,16 +14,35 @@ import { passwordReset } from "../controller/password-rest-controller";
 
 
 
+//for heartbeat post naveen
+import { postHeartBeat } from "../controller/heart-beat-controller";
+import { getUserHeartBeats } from "../controller/show-heart-beat-controller";
+import { getUserBreathRates } from '../controller/get-breathe-rate';
+import {postBreathRate} from '../controller/post-brethe-rate';
+import { exportHeartRateToExcel } from '../controller/excel-download-heart-rate';
+import { createVitalSigns, getRecentVitalSigns } from "../controller/vitalSign-controller";
+
+
+
 
 
 
 const router = express.Router();
 
 
+router.post('/vital-signs', createVitalSigns);
+router.get('/vital-signs/data', getRecentVitalSigns);
+//heart-beat rourtes
+router.post("/heart-beat", postHeartBeat);
+router.get("/heart-beat", getUserHeartBeats);
+//breathe-rates
+router.post("/breathe-rate", postBreathRate);
+router.get("/breathe-rate", getUserBreathRates)
+router.get('/heart-rate/export', exportHeartRateToExcel);
 
 router.post("/register-user", registerUser);
 router.post("/login-user", loginUser);
-router.post("/reset-password", passwordReset);
+
 
 
 router.use(verifyToken);
@@ -47,7 +66,10 @@ router.post("/add-bank-account", verifyToken,addBankAccount)
 router.get("/get-bank-accounts", verifyToken, getAllBankAccounts);
 
 //passsword-reset
-// router.post("/reset-password", passwordReset);
+router.post("/reset-password", passwordReset);
+
+
+
 
 
 

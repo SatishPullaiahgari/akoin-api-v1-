@@ -18,7 +18,7 @@ app.use((0, helmet_1.default)());
 app.use("/akoin", routes_1.default);
 // ✅ Connect to DB and start server only if DB is connected
 mongoose_1.default
-    .connect(process.env.MONGO_URI)
+    .connect('mongodb://localhost:27017/akoin-api(updated)')
     .then(() => {
     console.log("MongoDB connected successfully");
     app.listen(PORT, () => {

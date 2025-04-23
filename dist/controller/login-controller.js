@@ -11,7 +11,6 @@ const loginUser = async (req, res) => {
         if (!identifier || !password) {
             return res.status(400).json({ message: "Username/email and password are required" });
         }
-        console.log("Identifier:", identifier); // Debug
         const user = await loginSchema_1.LoginModel.findOne({
             $or: [
                 { email: { $regex: new RegExp(`^${identifier}$`, "i") } },
