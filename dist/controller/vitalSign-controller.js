@@ -5,8 +5,8 @@ const mongoose_1 = require("mongoose");
 // Define schema
 const VitalSignsSchema = new mongoose_1.Schema({
     // patient_id: { type: String, required: true },
-    resting_heart_rate: { type: [Number], required: true },
-    performance_heart_rate: { type: [Number], required: true },
+    avgHeartRate: { type: [Number], required: true },
+    AvgBreatheRate: { type: [Number], required: true },
     recorded_at: { type: Date, default: Date.now }
 });
 const VitalSignsModel = (0, mongoose_1.model)('VitalSigns', VitalSignsSchema);
@@ -50,8 +50,8 @@ const createVitalSigns = async (req, res) => {
         return res.status(200).json({
             message: 'Vital signs recorded successfully.',
             average: {
-                resting_heart_rate: calculateAverage(resting_heart_rate),
-                performance_heart_rate: calculateAverage(performance_heart_rate)
+                avgHeartRate: calculateAverage(resting_heart_rate),
+                avgBreatheRate: calculateAverage(performance_heart_rate)
             },
             data: {
                 heartRate: {

@@ -62,8 +62,8 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
     return res.status(200).json({
       message: 'Vital signs recorded successfully.',
       average: {
-        resting_heart_rate: calculateAverage(resting_heart_rate),
-        performance_heart_rate: calculateAverage(performance_heart_rate)
+        avgHeartRate: calculateAverage(resting_heart_rate),
+        avgBreatheRate: calculateAverage(performance_heart_rate)
       },
       data: {
           heartRate: {
