@@ -2,7 +2,7 @@
 // import { VitalSignsModel } from '../model/vitalSigns.model';
 // interface VitalSignEntry {
 //   patient_id: string;
-//   resting_heart_rate: number;
+//   heartRate: number;
 //   performance_heart_rate: number;
 //   recorded_at: Date;
 // }

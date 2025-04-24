@@ -10,7 +10,7 @@ const vitalSignsSchema = new mongoose_1.default.Schema({
         type: String,
         required: true
     },
-    resting_heart_rate: {
+    heartRate: {
         type: [Number], // This stores an array of numbers
         required: true,
         validate: {

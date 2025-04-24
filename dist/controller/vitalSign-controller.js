@@ -73,8 +73,7 @@ const createVitalSigns = async (req, res) => {
     }
 };
 exports.createVitalSigns = createVitalSigns;
-
-
+// ✅ GET API — Last 7 readings from latest document
 // ✅ GET API — Last 7 readings from latest document
 const getRecentVitalSigns = async (req, res) => {
     try {
@@ -87,12 +86,12 @@ const getRecentVitalSigns = async (req, res) => {
         if (!recentVitals.length) {
             return res.status(404).json({ message: 'No data found for this patient.' });
         }
-    
+        // Reverse to show oldest records first
         const ordered = recentVitals.reverse();
-       
-        const restingValues = ordered.map((doc) => doc.resting_heart_rate[doc.resting_heart_rate.length - 1]); 
+        // Map the values for resting and performance heart rate and their recorded_at timestamps
+        const restingValues = ordered.map((doc) => doc.resting_heart_rate[doc.resting_heart_rate.length - 1]); // Assuming 1 reading per entry
         const performanceValues = ordered.map((doc) => doc.performance_heart_rate[doc.performance_heart_rate.length - 1]);
-      
+        // Ensure 'recorded_at' exists and format it
         const recordedAtTimestamps = ordered.map((doc) => {
             const formattedDate = formatDate(doc.recorded_at);
             return formattedDate === 'N/A' ? 'Unknown Time' : formattedDate;
@@ -103,12 +102,12 @@ const getRecentVitalSigns = async (req, res) => {
             data: {
                 resting_heart_data: {
                     data: restingValues,
-                    time: recordedAtTimestamps, 
+                    time: recordedAtTimestamps, // Send formatted timestamps
                     average: avg(restingValues),
                 },
                 performance_heart_data: {
                     data: performanceValues,
-                    time: recordedAtTimestamps, 
+                    time: recordedAtTimestamps, // Send formatted timestamps
                     average: avg(performanceValues),
                 },
             },
