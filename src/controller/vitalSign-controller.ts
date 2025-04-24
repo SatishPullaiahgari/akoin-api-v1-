@@ -4,8 +4,8 @@ import mongoose, { Schema, model } from 'mongoose';
 // Define schema
 const VitalSignsSchema = new Schema({
   // patient_id: { type: String, required: true },
-  resting_heart_rate: { type: [Number], required: true },
-  performance_heart_rate: { type: [Number], required: true },
+  avgHeartRate: { type: [Number], required: true },
+  AvgBreatheRate: { type: [Number], required: true },
   recorded_at: { type: Date, default: Date.now }
 });
 
