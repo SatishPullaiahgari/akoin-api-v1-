@@ -4,8 +4,8 @@ import mongoose, { Schema, model } from 'mongoose';
 // Define schema
 const VitalSignsSchema = new Schema({
   // patient_id: { type: String, required: true },
-  avgHeartRate: { type: [Number], required: true },
-  AvgBreatheRate: { type: [Number], required: true },
+  heartRate: { type: [Number], required: true },
+  breatheRate: { type: [Number], required: true },
   recorded_at: { type: Date, default: Date.now }
 });
 
@@ -102,8 +102,8 @@ export const getRecentVitalSigns = async (req: Request, res: Response): Promise<
       const ordered = recentVitals.reverse();
   
      
-      const restingValues = ordered.map((doc) => doc.resting_heart_rate[doc.resting_heart_rate.length - 1]); 
-      const performanceValues = ordered.map((doc) => doc.performance_heart_rate[doc.performance_heart_rate.length - 1]);
+      const restingValues = ordered.map((doc) => doc.heartRate[doc.heartRate.length - 1]); 
+      const performanceValues = ordered.map((doc) => doc.breatheRate[doc.breatheRate.length - 1]);
       
    
       const recordedAtTimestamps = ordered.map((doc) => {
