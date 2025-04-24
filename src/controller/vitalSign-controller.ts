@@ -3,9 +3,9 @@ import mongoose, { Schema, model } from 'mongoose';
 
 // Define schema
 const VitalSignsSchema = new Schema({
-  // patient_id: { type: String, required: true },
-  heartRate: { type: [Number], required: true },
-  breatheRate: { type: [Number], required: true },
+  patient_id: { type: String, required: true },
+  resting_heart_rate: { type: [Number], required: true },
+  performance_heart_rate: { type: [Number], required: true },
   recorded_at: { type: Date, default: Date.now }
 });
 
@@ -27,7 +27,7 @@ const formatDate = (date: Date): string => {
         timeZone: 'Asia/Kolkata'
       };
   
-      return new Date(date).toLocaleString('en-IN', options); 
+      return new Date(date).toLocaleString('en-IN', options); // Simplified, no split or regex needed
     } catch (err) {
       console.error('[formatDate error]', err);
       return 'N/A';
@@ -39,7 +39,7 @@ const formatDate = (date: Date): string => {
 // ✅ POST API — Save 20 readings
 export const createVitalSigns = async (req: Request, res: Response): Promise<any> => {
   try {
-    // const patient_id = 'PAT000002';
+    const patient_id = 'PAT000002';
     const { resting_heart_rate, performance_heart_rate } = req.body;
 
     if (
@@ -52,7 +52,7 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
     }
 
     const saved = await VitalSignsModel.create({
-      // patient_id,
+      patient_id,
       resting_heart_rate,
       performance_heart_rate
     });
@@ -62,17 +62,19 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
     return res.status(200).json({
       message: 'Vital signs recorded successfully.',
       average: {
-        avgHeartRate: calculateAverage(resting_heart_rate),
-        avgBreatheRate: calculateAverage(performance_heart_rate)
+        resting_heart_rate: calculateAverage(resting_heart_rate),
+        performance_heart_rate: calculateAverage(performance_heart_rate)
       },
       data: {
-          heartRate: {
-          readings: resting_heart_rate,
-          takenAt: resting_heart_rate.map(() => formattedTime),
+        resting_heart_data: {
+          data: resting_heart_rate,
+          time: resting_heart_rate.map(() => formattedTime),
+          average: calculateAverage(resting_heart_rate)
         },
-        breateRate: {
-          readings: performance_heart_rate,
-          takenAt: performance_heart_rate.map(() => formattedTime),
+        performance_heart_data: {
+          data: performance_heart_rate,
+          time: performance_heart_rate.map(() => formattedTime),
+          average: calculateAverage(performance_heart_rate)
         }
       }
     });
@@ -82,14 +84,14 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
   }
 };
 
-
+// ✅ GET API — Last 7 readings from latest document
 // ✅ GET API — Last 7 readings from latest document
 export const getRecentVitalSigns = async (req: Request, res: Response): Promise<any> => {
     try {
-      // const patient_id = "PAT000002";
+      const patient_id = "PAT000002";
   
       // Fetch the latest 7 records for this patient
-      const recentVitals = await VitalSignsModel.find({ })
+      const recentVitals = await VitalSignsModel.find({ patient_id })
         .sort({ recorded_at: -1 })
         .limit(7)
         .lean();
@@ -98,14 +100,14 @@ export const getRecentVitalSigns = async (req: Request, res: Response): Promise<
         return res.status(404).json({ message: 'No data found for this patient.' });
       }
   
-     
+      // Reverse to show oldest records first
       const ordered = recentVitals.reverse();
   
-     
-      const restingValues = ordered.map((doc) => doc.heartRate[doc.heartRate.length - 1]); 
-      const performanceValues = ordered.map((doc) => doc.breatheRate[doc.breatheRate.length - 1]);
+      // Map the values for resting and performance heart rate and their recorded_at timestamps
+      const restingValues = ordered.map((doc) => doc.resting_heart_rate[doc.resting_heart_rate.length - 1]); // Assuming 1 reading per entry
+      const performanceValues = ordered.map((doc) => doc.performance_heart_rate[doc.performance_heart_rate.length - 1]);
       
-   
+      // Ensure 'recorded_at' exists and format it
       const recordedAtTimestamps = ordered.map((doc) => {
         const formattedDate = formatDate(doc.recorded_at);
         return formattedDate === 'N/A' ? 'Unknown Time' : formattedDate;
@@ -117,14 +119,14 @@ export const getRecentVitalSigns = async (req: Request, res: Response): Promise<
       return res.status(200).json({
         message: 'Last 7 heart rate readings fetched.',
         data: {
-          heartRate: {
-            readings: restingValues,
-            takenAt: recordedAtTimestamps, 
+          resting_heart_data: {
+            data: restingValues,
+            time: recordedAtTimestamps, // Send formatted timestamps
             average: avg(restingValues),
           },
-          breatheRate: {
-            readings: performanceValues,
-            takenAt: recordedAtTimestamps, 
+          performance_heart_data: {
+            data: performanceValues,
+            time: recordedAtTimestamps, // Send formatted timestamps
             average: avg(performanceValues),
           },
         },
