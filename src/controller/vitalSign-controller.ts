@@ -68,12 +68,12 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
       data: {
         resting_heart_data: {
           data: resting_heart_rate,
-          time: resting_heart_rate.map(() => formattedTime),
+          time: resting_heart_rate,
           average: calculateAverage(resting_heart_rate)
         },
         performance_heart_data: {
           data: performance_heart_rate,
-          time: performance_heart_rate.map(() => formattedTime),
+          time: performance_heart_rate,
           average: calculateAverage(performance_heart_rate)
         }
       }
@@ -84,15 +84,16 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
   }
 };
 
-// ✅ GET API — Last 7 readings from latest document
+
 // ✅ GET API — Last 7 readings from latest document
 export const getRecentVitalSigns = async (req: Request, res: Response): Promise<any> => {
     try {
       const patient_id = "PAT000002";
+      
   
       // Fetch the latest 7 records for this patient
       const recentVitals = await VitalSignsModel.find({ patient_id })
-        .sort({ recorded_at: -1 })
+        // .sort({ recorded_at: -1 })
         .limit(7)
         .lean();
   
@@ -136,4 +137,3 @@ export const getRecentVitalSigns = async (req: Request, res: Response): Promise<
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
-  
