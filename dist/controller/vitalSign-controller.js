@@ -15,14 +15,16 @@ const formatDate = (date) => {
     if (!date)
         return 'N/A';
     try {
+        // Instead of adjusting manually, we treat it as Indian time
+        const localDate = new Date(date);
         const options = {
-            weekday: 'short',
+            weekday: 'short', // e.g., Sat
             hour: '2-digit',
             minute: '2-digit',
             hour12: true,
-            timeZone: 'Asia/Kolkata'
+            timeZone: 'Asia/Kolkata' // This makes sure weekday and time are correctly in IST
         };
-        return new Date(date).toLocaleString('en-IN', options);
+        return localDate.toLocaleString('en-IN', options);
     }
     catch (err) {
         console.error('[formatDate error]', err);
@@ -40,13 +42,15 @@ const createVitalSigns = async (req, res) => {
                 message: 'heartRate, breathRate, and createdAt are required fields.'
             });
         }
+        // Parse createdAt properly
+        const createdDate = new Date(createdAt);
         const saved = await VitalSignsModel.create({
             heart_rate: heartRate,
             breath_rate: breathRate,
-            created_at: createdAt
+            created_at: createdDate
         });
         return res.status(201).json({
-            message: 'health records saved  successfully.',
+            message: 'Health record saved successfully.',
             data: {
                 heartRate: saved.heart_rate,
                 breathRate: saved.breath_rate,
@@ -60,20 +64,16 @@ const createVitalSigns = async (req, res) => {
     }
 };
 exports.createVitalSigns = createVitalSigns;
-//
 // ✅ GET API — Fetch last 7 heart & breath readings
-//
 const getRecentVitalSigns = async (req, res) => {
     try {
-        // Fetch latest 7 records
         const recentVitals = await VitalSignsModel.find({})
             .sort({ created_at: -1 })
             .limit(7)
             .lean();
-        if (!recentVitals.length) {
-            return res.status(404).json({ message: 'No data found.' });
-        }
-        // Reverse to oldest-first order
+        // if (!recentVitals.length) {
+        //   return res.status(200).json({ message: 'No data found.' });
+        // }
         const ordered = recentVitals.reverse();
         const heartRates = ordered.map((doc) => doc.heart_rate);
         const breathRates = ordered.map((doc) => doc.breath_rate);

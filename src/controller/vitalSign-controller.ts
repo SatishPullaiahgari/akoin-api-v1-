@@ -5,7 +5,7 @@ import mongoose, { Schema, model } from 'mongoose';
 const VitalSignsSchema = new Schema({
   heart_rate: { type: Number, required: true },
   breath_rate: { type: Number, required: true },
-  created_at: { type: Date, required: true, default: Date.now }
+  created_at: { type: String, required: true }  // Storing as string now
 });
 
 const VitalSignsModel = model('VitalSigns', VitalSignsSchema);
@@ -13,27 +13,6 @@ const VitalSignsModel = model('VitalSigns', VitalSignsSchema);
 // ✅ Utility functions
 const calculateAverage = (arr: number[]): number =>
   arr.length ? parseFloat((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1)) : 0;
-
-const formatDate = (date: Date | string): string => {
-  if (!date) return 'N/A';
-  try {
-    // Instead of adjusting manually, we treat it as Indian time
-    const localDate = new Date(date);
-    
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'short', // e.g., Sat
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: 'Asia/Kolkata' // This makes sure weekday and time are correctly in IST
-    };
-
-    return localDate.toLocaleString('en-IN', options);
-  } catch (err) {
-    console.error('[formatDate error]', err);
-    return 'N/A';
-  }
-};
 
 //
 // ✅ POST API — Save a single heartRate + breathRate
@@ -48,13 +27,13 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
       });
     }
 
-    // Parse createdAt properly
-    const createdDate = new Date(createdAt);
+    // Save createdAt as a string directly
+    // const createdDate = new Date(createdAt).toString(); // Save as string in the DB
 
     const saved = await VitalSignsModel.create({
       heart_rate: heartRate,
       breath_rate: breathRate,
-      created_at: createdDate
+      created_at: createdAt
     });
 
     return res.status(201).json({
@@ -62,7 +41,7 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
       data: {
         heartRate: saved.heart_rate,
         breathRate: saved.breath_rate,
-        takenAt: formatDate(saved.created_at)
+        takenAt: saved.created_at  // Send the raw string back to the frontend
       }
     });
   } catch (err) {
@@ -74,32 +53,33 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
 
 // ✅ GET API — Fetch last 7 heart & breath readings
 
+
 export const getRecentVitalSigns = async (req: Request, res: Response): Promise<any> => {
   try {
+   
     const recentVitals = await VitalSignsModel.find({})
-      .sort({ created_at: -1 })
-      .limit(7)
-      .lean();
+    .sort({ created_at: -1 })  // Sort by latest date first
+    .limit(7)  // Get only 7 records
+    .lean();
 
-    // if (!recentVitals.length) {
-    //   return res.status(200).json({ message: 'No data found.' });
-    // }
+  
 
-    const ordered = recentVitals.reverse();
+    const heartRates = recentVitals.map((doc) => doc.heart_rate);
+    const breathRates = recentVitals.map((doc) => doc.breath_rate);
+    const timestamps = recentVitals.map((doc) => doc.created_at); 
+     // Return the saved string timestamp
 
-    const heartRates = ordered.map((doc) => doc.heart_rate);
-    const breathRates = ordered.map((doc) => doc.breath_rate);
-    const timestamps = ordered.map((doc) => formatDate(doc.created_at));
+     console.log('time', timestamps)
 
     return res.status(200).json({
       heartRate: {
         readings: heartRates,
-        takenAt: timestamps,
+        takenAt: timestamps,  // Send the raw timestamps
         avgOfLast7Readings: calculateAverage(heartRates)
       },
       breathRate: {
         readings: breathRates,
-        takenAt: timestamps,
+        takenAt: timestamps,  // Send the raw timestamps
         avgOfLast7Readings: calculateAverage(breathRates)
       }
     });
