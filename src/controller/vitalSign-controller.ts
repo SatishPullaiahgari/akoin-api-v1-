@@ -134,7 +134,7 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
       heart_rate: roundedHeartRate,
       breath_rate: roundedBreathRate,
       created_at: createdAt,  // Save the raw string timestamp from frontend
-      // unique_id: uniqueId     // Store generated unique ID
+      unique_id: uniqueId     // Store generated unique ID
     });
 
     return res.status(201).json({
@@ -143,7 +143,7 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
         heartRate: saved.heart_rate,
         breathRate: saved.breath_rate,
         takenAt: saved.created_at,  // Return the exact timestamp
-        uniqueId: saved.unique_id   // Return the generated unique ID
+        // uniqueId: saved.unique_id   // Return the generated unique ID
       }
     });
   } catch (err) {
@@ -153,6 +153,7 @@ export const createVitalSigns = async (req: Request, res: Response): Promise<any
 };
 
 // ✅ GET API — Fetch last 7 heart & breath readings
+// ✅ GET API — Fetch last 7 heart & breath readings
 export const getRecentVitalSigns = async (req: Request, res: Response): Promise<any> => {
   try {
     // Fetch the most recent 7 records sorted by the unique ID
@@ -161,21 +162,24 @@ export const getRecentVitalSigns = async (req: Request, res: Response): Promise<
       .limit(7)
       .lean();
 
-    // Get the heartRates, breathRates, and timestamps (return the raw created_at from DB)
-    const heartRates = recentVitals.map((doc) => doc.heart_rate);
-    const breathRates = recentVitals.map((doc) => doc.breath_rate);
-    const timestamps = recentVitals.map((doc) => doc.created_at);  // Raw timestamps
+    // Reverse the array because Mongo returns latest first, and you want to show oldest first
+    const reversedVitals = recentVitals.reverse();
+
+    // Get the heartRates, breathRates, and timestamps
+    const heartRates = reversedVitals.map((doc) => doc.heart_rate);
+    const breathRates = reversedVitals.map((doc) => doc.breath_rate);
+    const timestamps = reversedVitals.map((doc) => doc.created_at);
 
     return res.status(200).json({
       heartRate: {
         readings: heartRates,
-        takenAt: timestamps,  // Raw timestamps from DB
-        avgOfLast7Readings: calculateAverage(heartRates)
+        takenAt: timestamps,
+        avgOfLast7Readings: Math.round(calculateAverage(heartRates))  // ✅ Properly rounded average
       },
       breathRate: {
         readings: breathRates,
-        takenAt: timestamps,  // Raw timestamps from DB
-        avgOfLast7Readings: calculateAverage(breathRates)
+        takenAt: timestamps,
+        avgOfLast7Readings: Math.round(calculateAverage(breathRates))  // ✅ Properly rounded average
       }
     });
   } catch (err) {
