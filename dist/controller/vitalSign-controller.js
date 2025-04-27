@@ -1,6 +1,4 @@
 "use strict";
-// import { Request, Response } from 'express';
-// import mongoose, { Schema, model } from 'mongoose';
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRecentVitalSigns = exports.createVitalSigns = void 0;
 const mongoose_1 = require("mongoose");
@@ -10,7 +8,7 @@ const VitalSignsSchema = new mongoose_1.Schema({
     heart_rate: { type: Number, required: true },
     breath_rate: { type: Number, required: true },
     created_at: { type: String, required: true }, // Raw timestamp as received from frontend
-    unique_id: { type: String, required: true } // Unique ID generated for sorting
+    timestamps: { type: Date, required: true } // Unique ID generated for sorting
 });
 const VitalSignsModel = (0, mongoose_1.model)('VitalSigns', VitalSignsSchema);
 // ✅ Utility functions
@@ -40,7 +38,7 @@ const createVitalSigns = async (req, res) => {
             heart_rate: roundedHeartRate,
             breath_rate: roundedBreathRate,
             created_at: createdAt, // Save the raw string timestamp from frontend
-            unique_id: uniqueId // Store generated unique ID
+            timestamps: new Date() // Store generated unique ID
         });
         return res.status(201).json({
             message: 'Health record saved successfully.',
@@ -59,12 +57,11 @@ const createVitalSigns = async (req, res) => {
 };
 exports.createVitalSigns = createVitalSigns;
 // ✅ GET API — Fetch last 7 heart & breath readings
-// ✅ GET API — Fetch last 7 heart & breath readings
 const getRecentVitalSigns = async (req, res) => {
     try {
         // Fetch the most recent 7 records sorted by the unique ID
         const recentVitals = await VitalSignsModel.find({})
-            .sort({ unique_id: -1 }) // Sort by the unique ID in descending order (latest first)
+            .sort({ timestamps: -1 }) // Sort by the unique ID in descending order (latest first)
             .limit(7)
             .lean();
         // Reverse the array because Mongo returns latest first, and you want to show oldest first
@@ -72,16 +69,16 @@ const getRecentVitalSigns = async (req, res) => {
         // Get the heartRates, breathRates, and timestamps
         const heartRates = reversedVitals.map((doc) => doc.heart_rate);
         const breathRates = reversedVitals.map((doc) => doc.breath_rate);
-        const timestamps = reversedVitals.map((doc) => doc.created_at);
+        const createdAt = reversedVitals.map((doc) => doc.created_at);
         return res.status(200).json({
             heartRate: {
                 readings: heartRates,
-                takenAt: timestamps,
+                takenAt: createdAt,
                 avgOfLast7Readings: Math.round(calculateAverage(heartRates)) // ✅ Properly rounded average
             },
             breathRate: {
                 readings: breathRates,
-                takenAt: timestamps,
+                takenAt: createdAt,
                 avgOfLast7Readings: Math.round(calculateAverage(breathRates)) // ✅ Properly rounded average
             }
         });
